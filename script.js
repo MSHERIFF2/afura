@@ -1,73 +1,57 @@
-// Add event listener to navigation links
-navLinks = document.querySelectorAll('nav a');
-navLinks.forEach(link => {
-	link.addEventListener('click', event => {
-		event.preventDefault();
-		const target = event.target.getAttribute('href');
-		document.querySelector(target).scrollIntoView();
-	});
+// Smooth Scroll
+document.querySelectorAll("nav a").forEach(link => {
+  link.addEventListener("click", e => {
+    e.preventDefault();
+    document.querySelector(link.getAttribute("href")).scrollIntoView({
+      behavior: "smooth"
+    });
+  });
 });
 
-const slideContainer = document.querySelector('.slider-container')
-const slides = slideContainer.querySelectorAll('.slide')
+// Mobile Menu Toggle
+const menuToggle = document.getElementById("menuToggle");
+const navMenu = document.getElementById("navMenu");
 
+menuToggle.addEventListener("click", () => {
+  navMenu.style.display =
+    navMenu.style.display === "block" ? "none" : "block";
+});
+
+// Slider Logic
+const slides = document.querySelectorAll(".slide");
 let currentSlide = 0;
+let intervalID;
 
-const nextBtn = document.getElementById('next-btn');
-const prevBtn = document.getElementById('prev-btn');
-
-nextBtn.addEventListener('click', navigateNext);
-prevBtn.addEventListener('click', navigatePrev);
-
-function navigateNext(){
-    currentSlide++;
-    updateSlide();
-    if (currentSlide >= slides.length) {
-        currentSlide = 0;
-    }
+function showSlide(index) {
+  slides.forEach((slide, i) => {
+    slide.style.opacity = i === index ? "1" : "0";
+  });
 }
 
-function navigatePrev(){
-    currentSlide--;
-    updateSlide();
-    if (currentSlide < 0) {
-        currentSlide = slides.length - 1;
-    }
+function nextSlide() {
+  currentSlide = (currentSlide + 1) % slides.length;
+  showSlide(currentSlide);
 }
 
-function updateSlide(){
-    slides.forEach((slide, index)=>{
-        slide.style.opacity = index === currentSlide ? 1: 0;
-    })
+function prevSlide() {
+  currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+  showSlide(currentSlide);
 }
-// ... (rest of the code remains the same)
 
-// Add a variable to store the interval ID
-let intervalID = null;
+document.getElementById("next-btn").addEventListener("click", () => {
+  clearInterval(intervalID);
+  nextSlide();
+});
 
-// Function to start the autoplay
+document.getElementById("prev-btn").addEventListener("click", () => {
+  clearInterval(intervalID);
+  prevSlide();
+});
+
+// Auto-play slider
 function startAutoplay() {
-  intervalID = setInterval(() => {
-    currentSlide++;
-    updateSlide();
-    if (currentSlide >= slides.length) {
-      currentSlide = 0;
-    }
-  }, 3000); // Change the interval time (in ms) as needed
+  intervalID = setInterval(nextSlide, 3000);
 }
 
-// Call the startAutoplay function to start the slider
 startAutoplay();
-
-// ... (rest of the code remains the same)
-
-nextBtn.addEventListener('click', () => {
-    clearInterval(intervalID);
-    navigateNext();
-  });
-  
-  prevBtn.addEventListener('click', () => {
-    clearInterval(intervalID);
-    navigatePrev();
-  });
-updateSlide();
+showSlide(currentSlide);
